@@ -88,8 +88,18 @@
 ; that are inside nested loops taken out. So we want to flatten all elements and have
 ; them all in a single list. For example '(a (a a) a))) should become (a a a a)
 (define (flatten lst)
-	'()
+  (cond
+    ((null? lst) 
+     '())  ; Base case: if the list is empty, return an empty list
+    ((list? (car lst))  ; If the first element is a list, recursively flatten it
+     (append (flatten (car lst))
+             (flatten (cdr lst))))
+    (else  ; Otherwise, add the first element to the result of flattening the rest
+     (cons (car lst)
+           (flatten (cdr lst))))
+  )
 )
+
 
 (line "flatten")
 (mydisplay (flatten '(a b c)))  ; -> (a b c)
@@ -104,7 +114,13 @@
 ; ((1 a) (1 b) (1 c) (2 a) (2 b) (2 c))
 ; lst1 & lst2 -- two flat lists.
 (define (crossproduct lst1 lst2)
-	'()
+  (if (null? lst1)
+      '()  ; Base case: if the first list is empty, return an empty list
+      (append
+        (map (lambda (x) (list (car lst1) x)) lst2)
+        (crossproduct (cdr lst1) lst2)
+      )
+  )
 )
 
 (line "crossproduct")
