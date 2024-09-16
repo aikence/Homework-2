@@ -46,7 +46,14 @@
 ; Returns true if the two lists have identical structure
 ; in terms of how many elements and nested lists they have in the same order
 (define (struct lst1 lst2)
-	#t
+  (cond
+    ((and (null? lst1) (null? lst2)) #t)  ; Both lists are empty
+    ((or (null? lst1) (null? lst2)) #f)   ; One list is empty and the other is not
+    ((and (list? (car lst1)) (list? (car lst2))) ; Both heads are lists
+     (and (struct (car lst1) (car lst2)) (struct (cdr lst1) (cdr lst2)))) ; Recursively check structure of heads and tails
+    ((and (not (list? (car lst1))) (not (list? (car lst2)))) ; Both heads are not lists
+     (struct (cdr lst1) (cdr lst2))) ; Continue checking tails
+    (else #f)) ; If one is a list and the other isn't
 )
 
 (line "struct")
@@ -60,8 +67,16 @@
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
 (define (minAndMax lst)
-	'()
+  (if (= (length lst) 1)
+      (list (car lst) (car lst))  ; Base case: single element, return it as both min and max
+      (let* ((rest (minAndMax (cdr lst)))  ; Recursive call on the rest of the list
+             (current-min (min (car lst) (car rest)))  ; Compare current element with min of rest
+             (current-max (max (car lst) (cadr rest))))  ; Compare current element with max of rest
+        (list current-min current-max)  ; Return list of min and max
+	   )
+	)
 )
+
 
 (line "minAndMax")
 (mydisplay (minAndMax '(1 2 -3 4 2)))  ; -> (-3 4)
