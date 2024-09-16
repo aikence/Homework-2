@@ -26,7 +26,13 @@
 ; ================ Solve the following functions ===================
 ; Return a list with only the negatives items
 (define (negatives lst)
-	lst
+  (if (null? lst) ; Checks if the list is empty
+      '()  ; Return an empty list if lst is empty
+      (if (>= (car lst) 0)  ; Check if the first element is non-negative
+          (negatives (cdr lst))  ; Skip the element and process the rest
+          (cons (car lst) (negatives (cdr lst)))  ; Otherwise, include it
+      )
+  )
 )
 
 (line "negatives")
