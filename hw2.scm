@@ -238,8 +238,42 @@
 ; zip1 & zip2 -- the two zip codes in question.
 ; zips -- zipcode DB
 (define (getDistanceBetweenZipCodes zip1 zip2 zips)
-	0
-)
+  (let* ((lat-lon1 (find-lat-lon zip1 zips))  ; Get lat/lon for zip1
+         (lat-lon2 (find-lat-lon zip2 zips))  ; Get lat/lon for zip2
+         (lat1 (deg-to-rad (car lat-lon1)))
+         (lon1 (deg-to-rad (cadr lat-lon1)))
+         (lat2 (deg-to-rad (car lat-lon2)))
+         (lon2 (deg-to-rad (cadr lat-lon2)))
+         (dlat (- lat2 lat1))  ; Difference in latitude
+         (dlon (- lon2 lon1))  ; Difference in longitude
+         (a (+ (sin (/ dlat 2)) (sin (/ dlat 2))
+               (* (cos lat1) (cos lat2) (sin (/ dlon 2)) (sin (/ dlon 2)))))
+         (c (* 2 (atan2 (sqrt a) (sqrt (- 1 a))))))  ; Use atan2 directly
+    (* earth-radius-meters c)))  ; Distance in meters
+
+; helper code for getDistanceBetweenZipCodes
+(define pi 3.141592653589793)
+(define earth-radius-meters 6371000)  ; Earth's radius in meters
+
+; Converts degrees to radians
+(define (deg-to-rad deg)
+  (* deg (/ pi 180)))
+
+; Helper function to find the lat/lon of a given zip code
+(define (find-lat-lon zip zips)
+  (let ((entry (first (filter (lambda (z) (equal? (car z) zip)) zips))))
+    (if entry
+        (list (cadddr entry) (cadddr (cdr entry)))  ; Return latitude and longitude
+        (error "Zip code not found"))))
+
+; Scheme doesn't include this function but makes this easier, written here to use normally
+(define (atan2 y x)
+  (cond
+    ((> x 0) (atan (/ y x)))  ; Quadrant I
+    ((and (< x 0) (> y 0)) (+ (atan (/ y x)) pi))  ; Quadrant II
+    ((and (< x 0) (< y 0)) (- (atan (/ y x)) pi))  ; Quadrant III
+    ((= x 0) (if (> y 0) (/ pi 2) (- (/ pi 2))) )  ; Quadrant IV
+    (else 0)))  ; Point is (0,0)
 
 (line "getDistanceBetweenZipCodes")
 (mydisplay (getDistanceBetweenZipCodes 45056 48122 zipcodes))
