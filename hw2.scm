@@ -136,7 +136,12 @@
 ; from the 'zipcodes.scm' file for this. You can just call 'zipcodes' directly
 ; as shown in the sample example
 (define (getLatLon zipcode zips)
-	(list zipcode (car zips))
+  (cond ; iterate over zipcodes in zipcodes.scm
+    ((null? zips) #f) ; check if no zips left
+    ((equal? zipcode (car (car zips)))); check if zipcode matches with equal?
+    (list (cadddr (car zips)) (car (cddddr (car zips)))); if zipcode is match, return first pair of zips for that zipcode
+	  (else (getLatLon zipcode (cdr zips))) ; Recurse with the rest of the list
+  )
 )
 
 (line "getLatLon")
@@ -148,8 +153,15 @@
 ; placeName -- is the text corresponding to the name of the place
 ; zips -- the zipcode DB
 (define (getCommonPlaces state1 state2 zips)
-	(list state1 state2)
-)
+  (define (places-in-state state zips)
+    (map (lambda (entry) (cadr entry))  ; extract place name (second element)
+         (filter (lambda (entry) (equal? (caddr entry) state)) zips)))  ; filter by state (third element)
+
+  ;; Find the common places between two states, and remove duplicates
+  (remove-duplicates
+   (filter (lambda (place)
+             (member place (places-in-state state2 zips)))  ; filter to keep common places
+           (places-in-state state1 zips))))  ; get the places from state1
 
 (line "getCommonPlaces")
 (mydisplay (getCommonPlaces "OH" "MI" zipcodes))
@@ -160,8 +172,9 @@
 ; state -- state
 ; zips -- zipcode DB
 (define (zipCount state zips)
-	0
-)
+  (define (state-matches? entry)
+    (equal? (caddr entry) state))  ; Check if the third element (state) matches the given state
+  (length (filter state-matches? zips)))  ; Filter the entries and count them
 
 (line "zipCount")
 (mydisplay (zipCount "OH" zipcodes))
@@ -181,8 +194,9 @@
 ; filters -- list of predicates to apply to the individual elements
 
 (define (filterList lst filters)
-	lst
-)
+  (define (satisfies-all? x filters)
+    (foldl (lambda (pred acc) (and (pred x) acc)) #t filters))  ; Check all predicates
+  (filter (lambda (x) (satisfies-all? x filters)) lst))  ; Apply filters to the list
 
 (line "filterList")
 (mydisplay (filterList '(1 2 3 11 22 33 -1 -2 -3 -11 -22 -33) (list POS?)))
@@ -196,8 +210,20 @@
 ; states -- is list of state names
 ; zips -- the zipcode DB
 (define (getCommonPlaces2 states zips)
-	'("Oxford" "Franklin")
-)
+  ;; Helper function to extract place names for a given state
+  (define (places-in-state state zips)
+    (map (lambda (entry) (cadr entry))  ; extract place name (second element)
+         (filter (lambda (entry) (equal? (caddr entry) state)) zips)))  ; filter by state (third element)
+
+  ;; Initialize with places from the first state
+  (let loop ((remaining-states (cdr states))  ; Start with the rest of the states
+             (common-places (places-in-state (car states) zips)))  ; Start with places from the first state
+    (if (null? remaining-states)
+        (remove-duplicates common-places)  ; Remove duplicates from the final result
+        (loop (cdr remaining-states)  ; Continue with the remaining states
+              (filter (lambda (place)  ; Update common-places with the intersection
+                        (member place (places-in-state (car remaining-states) zips)))
+                      common-places)))))
 
 (line "getCommonPlaces2")
 (mydisplay (getCommonPlaces2 '("OH" "MI" "PA") zipcodes))
