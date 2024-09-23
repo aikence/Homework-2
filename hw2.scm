@@ -246,9 +246,9 @@
          (lon2 (deg-to-rad (cadr lat-lon2)))
          (dlat (- lat2 lat1))  ; Difference in latitude
          (dlon (- lon2 lon1))  ; Difference in longitude
-         (a (+ (sin (/ dlat 2)) (sin (/ dlat 2))
-               (* (cos lat1) (cos lat2) (sin (/ dlon 2)) (sin (/ dlon 2)))))
-         (c (* 2 (atan2 (sqrt a) (sqrt (- 1 a))))))  ; Use atan2 directly
+         (a (+ (expt (sin (/ dlat 2)) 2)
+               (* (cos lat1) (cos lat2) (expt (sin (/ dlon 2)) 2))))
+         (c (* 2 (atan (sqrt a) (sqrt (- 1 a))))))  ; Use atan directly
     (* earth-radius-meters c)))  ; Distance in meters
 
 ; helper code for getDistanceBetweenZipCodes
@@ -263,8 +263,9 @@
 (define (find-lat-lon zip zips)
   (let ((entry (first (filter (lambda (z) (equal? (car z) zip)) zips))))
     (if entry
-        (list (cadddr entry) (cadddr (cdr entry)))  ; Return latitude and longitude
-        (error "Zip code not found"))))
+        (list (cadr (cdddr entry))  ; Latitude (5th element)
+              (caddr (cdddr entry))) ; Longitude (6th element)
+        (error "Zip code not found")))) ; zip doesn't exist in list
 
 ; Scheme doesn't include this function but makes this easier, written here to use normally
 (define (atan2 y x)
