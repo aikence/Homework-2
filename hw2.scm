@@ -30,10 +30,7 @@
       '()  ; Return an empty list if lst is empty
       (if (>= (car lst) 0)  ; Check if the first element is non-negative
           (negatives (cdr lst))  ; Skip the element and process the rest
-          (cons (car lst) (negatives (cdr lst)))  ; Otherwise, include it
-      )
-  )
-)
+          (cons (car lst) (negatives (cdr lst))))))  ; Otherwise, include it
 
 (line "negatives")
 (mydisplay (negatives '()))  ; -> ()
@@ -41,8 +38,8 @@
 (mydisplay (negatives '(-1 1 2 3 4 -4 5)))  ; -> (-1 -4)
 (mydisplay (negatives '(1 1 2 3 4 4 5)))  ; -> ()
 (line "negatives")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns true if the two lists have identical structure
 ; in terms of how many elements and nested lists they have in the same order
 (define (struct lst1 lst2)
@@ -53,16 +50,15 @@
      (and (struct (car lst1) (car lst2)) (struct (cdr lst1) (cdr lst2)))) ; Recursively check structure of heads and tails
     ((and (not (list? (car lst1))) (not (list? (car lst2)))) ; Both heads are not lists
      (struct (cdr lst1) (cdr lst2))) ; Continue checking tails
-    (else #f)) ; If one is a list and the other isn't
-)
+    (else #f))) ; If one is a list and the other isn't
 
 (line "struct")
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c))))  ; -> #t
 (mydisplay (struct '(a b c d (c a b)) '(1 2 3 (a b c))))  ; -> #f
 (mydisplay (struct '(a b c (c a b)) '(1 2 3 (a b c) 0)))  ; -> #f
 (line "struct")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns a list of two numeric values. The first is the smallest
 ; in the list and the second is the largest in the list. 
 ; lst -- contains numeric values, and length is >= 1.
@@ -72,18 +68,14 @@
       (let* ((rest (minAndMax (cdr lst)))  ; Recursive call on the rest of the list
              (current-min (min (car lst) (car rest)))  ; Compare current element with min of rest
              (current-max (max (car lst) (cadr rest))))  ; Compare current element with max of rest
-        (list current-min current-max)  ; Return list of min and max
-	   )
-	)
-)
-
+        (list current-min current-max))))  ; Return list of min and max
 
 (line "minAndMax")
 (mydisplay (minAndMax '(1 2 -3 4 2)))  ; -> (-3 4)
 (mydisplay (minAndMax '(1)))  ; -> (1 1)
 (line "minAndMax")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns a list identical to the first list, while having all elements
 ; that are inside nested loops taken out. So we want to flatten all elements and have
 ; them all in a single list. For example '(a (a a) a))) should become (a a a a)
@@ -100,14 +92,13 @@
   )
 )
 
-
 (line "flatten")
 (mydisplay (flatten '(a b c)))  ; -> (a b c)
 (mydisplay (flatten '(a (a a) a)))  ; -> (a a a a)
 (mydisplay (flatten '((a b) (c (d) e) f)))  ; -> (a b c d e f)
 (line "flatten")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; The paramters are two lists. The result should contain the cross product
 ; between the two lists: 
 ; The inputs '(1 2) and '(a b c) should return a single list:
@@ -126,8 +117,8 @@
 (line "crossproduct")
 (mydisplay (crossproduct '(1 2) '(a b c)))
 (line "crossproduct")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns the first latitude and longitude of a particular zip code.
 ; if there are multiple latitude and longitude pairs for the same zip code,
 ; the function should only return the first pair. e.g. (53.3628 -167.5107)
@@ -147,8 +138,8 @@
 (line "getLatLon")
 (mydisplay (getLatLon 45056 zipcodes))
 (line "getLatLon")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns a list of all the place names common to two states.
 ; placeName -- is the text corresponding to the name of the place
 ; zips -- the zipcode DB
@@ -166,8 +157,8 @@
 (line "getCommonPlaces")
 (mydisplay (getCommonPlaces "OH" "MI" zipcodes))
 (line "getCommonPlaces")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Returns the number of zipcode entries for a particular state.
 ; state -- state
 ; zips -- zipcode DB
@@ -179,8 +170,8 @@
 (line "zipCount")
 (mydisplay (zipCount "OH" zipcodes))
 (line "zipCount")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; Some sample predicates
 (define (POS? x) (> x 0))
 (define (NEG? x) (< x 0))
@@ -192,7 +183,6 @@
 ; (filterList '(1 2 3 4 100) '(EVEN? SMALL?)) should return (2 4)
 ; lst -- flat list of items
 ; filters -- list of predicates to apply to the individual elements
-
 (define (filterList lst filters)
   (define (satisfies-all? x filters)
     (foldl (lambda (pred acc) (and (pred x) acc)) #t filters))  ; Check all predicates
@@ -203,8 +193,8 @@
 (mydisplay (filterList '(1 2 3 11 22 33 -1 -2 -3 -11 -22 -33) (list POS? even?)))
 (mydisplay (filterList '(1 2 3 11 22 33 -1 -2 -3 -11 -22 -33) (list POS? even? LARGE?)))
 (line "filterList")
-; ---------------------------------------------
 
+; ---------------------------------------------
 ; #### Only for Graduate Students ####
 ; Returns a list of all the place names common to a set of states.
 ; states -- is list of state names
@@ -230,7 +220,6 @@
 (line "getCommonPlaces2")
 
 ; ---------------------------------------------
-
 ; #### Only for Graduate Students ####
 ; Returns the distance between two zip codes in "meters".
 ; Use lat/lon. Do some research to compute this.
@@ -279,7 +268,3 @@
 (line "getDistanceBetweenZipCodes")
 (mydisplay (getDistanceBetweenZipCodes 45056 48122 zipcodes))
 (line "getDistanceBetweenZipCodes")
-; ---------------------------------------------
-
-
-
